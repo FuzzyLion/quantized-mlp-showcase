@@ -1,6 +1,6 @@
 {
   "record_date": "2026-10-31",
-  "evidence_basis": "Manually transcribed from saved Vivado reports; original reports and build inputs are not included in this public summary.",
+  "evidence_basis": "Implementation metrics transcribed from saved Vivado reports; earlier functional results from the historical implementation report and serial transcript. Original evidence and build inputs are not included in this public summary.",
   "tool": "Vivado 2026.1",
   "device": "xc7a100tcsg324-1",
   "network": {
@@ -66,7 +66,26 @@
   },
   "contributions": {
     "course": "Framework, model, templates and supporting implementation.",
-    "qi_wu": "Study of quantized hardware generation; reran the repaired Vivado project, generated the bitstream and exported results.",
+    "qi_wu": "Implemented the four generator parameter functions for per-neuron scale/zero-point correction, accumulator width, fixed-point multiplier and shift; integrated them into the course framework; completed the earlier Vivado flow and board check; reran Vivado after the AI-implemented repair and exported results.",
     "ai_assistance": "Implemented the UART/constraint timing repair and directed verification scripts; assisted with repository organization and public documentation."
+  },
+  "earlier_results": {
+    "stage": "Before the 31 October 2026 UART/constraint timing repair",
+    "integer_equivalent_evaluation": {
+      "correct": 9526,
+      "test_vectors": 10000,
+      "accuracy_percent": 95.26,
+      "method": "Python model of the RTL integer arithmetic",
+      "evidence": "Saved historical implementation report; not a fresh full-dataset evaluation of the repaired build"
+    },
+    "on_board_functional_check": {
+      "correct": 29,
+      "samples": 30,
+      "selection": "Randomly selected samples",
+      "board": "Nexys A7-100T",
+      "interface": "Course-provided UART test flow",
+      "evidence": "Saved serial terminal transcript; no exact test date or bitstream identifier recorded",
+      "interpretation": "Small functional sample, not full-dataset model accuracy; not a post-repair board retest"
+    }
   }
 }

@@ -4,7 +4,7 @@ The main lesson for me was that integer arithmetic, data movement and timing con
 
 ## Quantization and hardware cost
 
-An 8-bit operand does not imply an 8-bit accumulator. Products and sums need wider intermediate values, and the final result needs rescaling before it can be passed to the next layer. I studied how scale and zero-point information connects a quantized software model to that integer datapath.
+An 8-bit operand does not imply an 8-bit accumulator. Products and sums need wider intermediate values, and the final result needs rescaling before it can be passed to the next layer. I implemented the generator parameter functions that connect scale and zero-point information to that integer datapath, together with accumulator-width and fixed-point multiplier/shift generation.
 
 Some parameter-dependent operations can be prepared before inference. That shifts work into the generation step, but makes the generated circuit specific to its model and numeric assumptions. Reusing the same flow for another model would require checking ranges, rounding and output narrowing again.
 
@@ -28,4 +28,4 @@ That protocol is simple to reason about, but it is not a streaming throughput de
 
 The saved routed reports support internal timing closure for the applied constraints. They also show high Slice occupancy and retained implementation warnings. Missing external I/O delays still need interface-specific review, and the repaired implementation still needs a physical board retest.
 
-For an interview, I would discuss how the timing problem was uncovered, what changed at the interface, and what evidence remains missing. These notes summarize those lessons without reproducing the course implementation or a complete lab answer.
+The earlier integer-equivalent evaluation and 29/30 board check apply to the pre-repair design. The later routed reports describe the repaired implementation. Keeping those stages separate preserves what each result establishes.
