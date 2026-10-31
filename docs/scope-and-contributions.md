@@ -1,12 +1,12 @@
 # Scope and contributions
 
-I created this public repository as a technical summary of course-based work. It has its own Git history and contains newly written prose, a high-level Mermaid diagram and a structured result summary.
+I created this documentation-only repository as a technical summary of course-based work. It has its own Git history and contains newly written prose, a high-level Mermaid diagram and a structured result summary.
 
 ## Sources and roles
 
 The project originates from Hardware for Neural Networks coursework at TU Darmstadt. The course supplied the framework, model, templates and supporting implementation. I do not claim independent authorship of that framework or present the generated neural-network RTL as hand-written work.
 
-I implemented the four required generator parameter functions: per-neuron scale and zero-point correction, accumulator width, fixed-point multiplier generation, and shift generation. I integrated them into the course-provided framework and completed the earlier Vivado flow and UART-based board check. After the later AI-implemented timing repair, I reran the Vivado project, generated the final bitstream and exported its implementation results.
+I implemented the four required generator parameter functions: per-neuron scale and zero-point correction, accumulator width, fixed-point multiplier generation, and shift generation. I integrated them into the course-provided framework and completed the earlier Vivado flow and UART-based board check. For the later timing-repair extension, I reran the Vivado project, generated the final bitstream and exported its implementation results.
 
 An AI coding agent implemented the UART/constraint timing repair and prepared its directed verification scripts. AI also assisted with repository organization, verification helpers, and the writing and diagram in this public summary. The simulation logs report checks of that repair; they do not establish complete physical hardware verification.
 
