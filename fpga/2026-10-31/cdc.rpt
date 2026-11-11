@@ -1,0 +1,18 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (lin64) Build 6511674 Tue Jun 16 11:01:26 MDT 2026
+| Date         : Sat Oct 31 14:27:56 2026
+| Host         : qi-wu-ThinkBook-16-G8-IPH running 64-bit Ubuntu 26.04.1 LTS
+| Command      : report_cdc -file /home/qi-wu/project_quant_net/portfolio_export_20261031_142730/cdc.rpt
+| Design       : uart_top
+| Device       : 7a100t-csg324
+| Speed File   : -1  PRODUCTION 1.23 2018-06-13
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+CDC Report
+
+Severity  Source Clock  Destination Clock  CDC Type      Exceptions  Endpoints  Safe  Unsafe  Unknown  No ASYNC_REG  
+--------  ------------  -----------------  ------------  ----------  ---------  ----  ------  -------  ------------  
+Info      net_clk       sys_clk            Safely Timed  None                1     1       0        0             0  
+

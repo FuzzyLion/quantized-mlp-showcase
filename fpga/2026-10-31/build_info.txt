@@ -1,0 +1,6 @@
+Export time: 2026-10-31 14:27:30 CET
+Vivado: 2026.1
+FPGA part: xc7a100tcsg324-1
+Top module: uart_top
+Synthesis status: synth_design Complete!
+Implementation status: write_bitstream Complete!

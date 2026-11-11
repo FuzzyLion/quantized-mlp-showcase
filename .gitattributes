@@ -1,1 +1,7 @@
 * text=auto eol=lf
+*.pt binary
+*.bit binary
+# Preserve supplied implementation evidence and its source hashes byte-for-byte.
+fpga/2026-10-31/** -text -whitespace
+fpga/2026-10-31/recreate_project.tcl text eol=lf
+fpga/2026-10-31/manifest.json text eol=lf

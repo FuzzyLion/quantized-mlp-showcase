@@ -1,0 +1,15 @@
+{% macro extNeuron(idx, weights, bias, width, neuron_width) %}
+{% for w in weights -%}{%- if w != 0 -%}
+wire signed [2*WIDTH_IN-1:0] interm_{{ idx }}_{{ loop.index0 }};
+FMUL #(.WIDTH(WIDTH_IN), .FACTOR({{ w | renderInt(width) }})) mul{{ idx }}_{{ loop.index0 }} (.w_in(w_in[{{ loop.index0 }}*WIDTH_IN+:WIDTH_IN]), .w_out(interm_{{ idx }}_{{ loop.index0 }}));
+{% endif %}{% endfor %}
+
+wire signed [{{ neuron_width }}-1:0] bias_{{idx}} = {{ bias | renderInt(neuron_width) }};
+
+assign n{{ idx }}_out =
+{% for w in weights -%}{%- if w != 0 -%}
+$signed(interm_{{ idx }}_{{ loop.index0 }}) +
+{% endif %}{% endfor %}
+$signed(bias_{{idx}});
+
+{% endmacro %}

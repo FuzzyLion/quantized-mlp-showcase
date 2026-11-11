@@ -1,0 +1,45 @@
+
+
+module {{ modulename }} #(
+    WIDTH_IN = {{ quant_width }},
+    NUM_IN = {{ num_in }},
+    NUM_NEURONS = {{ num_neurons }},
+    WIDTH_OUT = {{ quant_width }}
+) (
+    input wire signed [NUM_IN*WIDTH_IN-1:0] w_in,
+    output wire signed [NUM_NEURONS*WIDTH_OUT-1:0] w_out
+);
+
+/*
+ * Connect Neuros
+ */
+{% from 'neuron.sv.jinja2' import extNeuron %}
+{% for weights, scale, precompute, zero, neuron_width in neurons %}
+// ---Neuro {{ loop.index0 }} ---
+localparam NEURON_WIDTH_{{ loop.index0 }} = {{ neuron_width }};
+wire signed [NEURON_WIDTH_{{ loop.index0 }}-1:0] n{{ loop.index0 }}_out;
+{{ extNeuron(loop.index0, weights, precompute, quant_width, neuron_width) }}
+{% endfor %}
+
+/*
+ * requantize outputs
+ */
+wire signed [WIDTH_OUT:0] requant_out [NUM_NEURONS];
+{% for w, s, p, z, neuron_width in neurons %}
+DEQUANT #(.WIDTH_IN({{ neuron_width }}), .WIDTH_OUT(WIDTH_OUT+1), .SCALE({{ s | render_scale(neuron_width, precision) }}), .ZERO({{ z | renderInt(quant_width+1) }}), .SHIFT({{ s | render_shift(neuron_width, precision)}})) requant{{ loop.index0 }} (.w_in(n{{ loop.index0 }}_out), .w_out(requant_out[{{ loop.index0 }}]));
+{% endfor %}
+
+{% if relu %}
+/*
+ * ReLU
+ */
+{% for w, s, p, z, neuron_width in neurons %}
+RELU #(.WIDTH(WIDTH_OUT + 1)) relu{{ loop.index0 }} (.w_in(requant_out[{{ loop.index0 }}]), .w_out(w_out[{{ loop.index0 }}*WIDTH_OUT+:WIDTH_OUT]));
+{% endfor %}
+{% else %}
+{% for w, s, p, z, neuron_width in neurons %}
+assign w_out[{{ loop.index0 }}*WIDTH_OUT+:WIDTH_OUT] = requant_out[{{ loop.index0 }}];
+{% endfor %}
+{% endif %}
+
+endmodule : {{ modulename }}

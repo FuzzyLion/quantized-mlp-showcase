@@ -1,0 +1,5 @@
+PASS: UART frames, 784-byte ordering, pipeline latency, ties, one reply/frame, reset recovery
+- work/rtl_timing_fix/tb_uart_wrapper.sv:79: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.032 2025-01-01
+- Verilator: $finish at 2s; walltime 29.803 s; speed 55.225 ms/s
+- Verilator: cpu 29.786 s on 1 threads; alloced 121 MB

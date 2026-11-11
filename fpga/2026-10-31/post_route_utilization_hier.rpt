@@ -1,0 +1,245 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (lin64) Build 6511674 Tue Jun 16 11:01:26 MDT 2026
+| Date         : Sat Oct 31 14:27:50 2026
+| Host         : qi-wu-ThinkBook-16-G8-IPH running 64-bit Ubuntu 26.04.1 LTS
+| Command      : report_utilization -hierarchical -file /home/qi-wu/project_quant_net/portfolio_export_20261031_142730/post_route_utilization_hier.rpt
+| Design       : uart_top
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-----------------+-----------------------------+------------+------------+---------+------+------+--------+--------+------------+
+|     Instance    |            Module           | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
++-----------------+-----------------------------+------------+------------+---------+------+------+--------+--------+------------+
+| uart_top        |                       (top) |      49062 |      49062 |       0 |    0 | 4025 |      0 |      0 |         40 |
+|   (uart_top)    |                       (top) |      10784 |      10784 |       0 |    0 | 3608 |      0 |      0 |          0 |
+|   net_1         |                     top_clk |      37960 |      37960 |       0 |    0 |  320 |      0 |      0 |         40 |
+|     (net_1)     |                     top_clk |        127 |        127 |       0 |    0 |  320 |      0 |      0 |          0 |
+|     fc1         |                         FC1 |      30581 |      30581 |       0 |    0 |    0 |      0 |      0 |         30 |
+|       mul0_120  |        FMUL__parameterized2 |         57 |         57 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_219  |     FMUL__parameterized4_78 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_248  |        FMUL__parameterized5 |         96 |         96 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_249  |        FMUL__parameterized6 |         57 |         57 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_292  |    FMUL__parameterized10_80 |         54 |         54 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_317  |       FMUL__parameterized14 |         61 |         61 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_343  |       FMUL__parameterized18 |         92 |         92 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_344  |       FMUL__parameterized19 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_347  |       FMUL__parameterized20 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_350  |    FMUL__parameterized21_83 |         97 |         97 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_404  |     FMUL__parameterized5_86 |         66 |         66 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_415  |       FMUL__parameterized25 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul10_213 |       FMUL__parameterized52 |         82 |         82 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul10_442 |   FMUL__parameterized70_111 |        150 |        150 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul10_583 |   FMUL__parameterized29_119 |         53 |         53 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul11_350 |   FMUL__parameterized19_131 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul11_378 |   FMUL__parameterized69_133 |         97 |         97 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul11_415 |   FMUL__parameterized98_136 |         54 |         54 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul11_440 |    FMUL__parameterized1_139 |         54 |         54 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul11_664 |      FMUL__parameterized112 |         82 |         82 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul12_178 |   FMUL__parameterized35_148 |         59 |         59 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul12_205 |   FMUL__parameterized35_151 |         62 |         62 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul12_328 |    FMUL__parameterized5_158 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul12_360 |   FMUL__parameterized52_163 |         62 |         62 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul12_388 |   FMUL__parameterized10_166 |         54 |         54 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul12_488 |    FMUL__parameterized6_169 |         56 |         56 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul13_376 |    FMUL__parameterized2_176 |         66 |         66 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul13_440 |  FMUL__parameterized116_181 |         53 |         53 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul13_516 |  FMUL__parameterized119_187 |         80 |         80 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul13_538 |    FMUL__parameterized9_189 |         58 |         58 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul13_679 |  FMUL__parameterized116_197 |         77 |         77 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul14_162 |    FMUL__parameterized0_200 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul14_248 |   FMUL__parameterized10_201 |         56 |         56 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul14_383 |    FMUL__parameterized8_208 |         72 |         72 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul14_516 |    FMUL__parameterized7_215 |         61 |         61 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul15_440 |      FMUL__parameterized124 |         78 |         78 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul15_523 |   FMUL__parameterized43_239 |        115 |        115 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul15_631 |   FMUL__parameterized34_247 |         68 |         68 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul15_689 |   FMUL__parameterized34_256 |         59 |         59 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul16_219 |       FMUL__parameterized60 |         81 |         81 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul16_288 |   FMUL__parameterized21_277 |        161 |        161 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul16_292 |   FMUL__parameterized38_279 |         53 |         53 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul16_376 |   FMUL__parameterized24_285 |        100 |        100 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul17_247 |   FMUL__parameterized24_300 |         55 |         55 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul17_293 |   FMUL__parameterized82_303 |        140 |        140 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul17_399 |   FMUL__parameterized25_309 |         57 |         57 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul18_120 |   FMUL__parameterized93_324 |         68 |         68 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul18_178 |   FMUL__parameterized24_328 |         66 |         66 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul18_180 |   FMUL__parameterized12_329 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul18_270 |   FMUL__parameterized16_339 |         71 |         71 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul18_295 |   FMUL__parameterized25_342 |        144 |        144 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul18_347 |   FMUL__parameterized80_345 |         58 |         58 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul18_747 |   FMUL__parameterized72_355 |         65 |         65 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul19_150 |   FMUL__parameterized80_362 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul19_173 |   FMUL__parameterized19_364 |         92 |         92 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul19_327 |   FMUL__parameterized52_372 |         84 |         84 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul19_330 |   FMUL__parameterized25_375 |         53 |         53 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul19_624 |   FMUL__parameterized39_381 |        107 |        107 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul1_145  |   FMUL__parameterized35_384 |         69 |         69 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul1_397  |   FMUL__parameterized40_390 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul1_490  |   FMUL__parameterized44_397 |         54 |         54 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul1_714  |   FMUL__parameterized52_406 |        121 |        121 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul20_243 |       FMUL__parameterized58 |         66 |         66 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul20_301 |  FMUL__parameterized106_418 |         59 |         59 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul20_330 |  FMUL__parameterized129_424 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul20_386 |   FMUL__parameterized13_427 |        169 |        169 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul20_491 |   FMUL__parameterized10_431 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul20_624 |   FMUL__parameterized12_437 |         97 |         97 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul20_710 |   FMUL__parameterized65_440 |         64 |         64 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul21_233 |   FMUL__parameterized93_446 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul21_248 |  FMUL__parameterized104_447 |         61 |         61 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul21_267 |   FMUL__parameterized52_448 |         57 |         57 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul21_299 |   FMUL__parameterized66_451 |         96 |         96 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul22_232 |   FMUL__parameterized98_461 |         97 |         97 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul22_487 |   FMUL__parameterized22_479 |         54 |         54 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul22_513 |   FMUL__parameterized15_480 |         61 |         61 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul22_547 |  FMUL__parameterized102_483 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul22_570 |    FMUL__parameterized5_484 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul23_157 |                    FMUL_502 |         80 |         80 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul23_354 |   FMUL__parameterized14_511 |        147 |        147 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul23_377 |   FMUL__parameterized97_512 |         65 |         65 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul23_439 |   FMUL__parameterized56_518 |         59 |         59 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul23_465 |   FMUL__parameterized18_521 |         55 |         55 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul23_491 |    FMUL__parameterized5_524 |         64 |         64 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul23_516 |   FMUL__parameterized66_527 |         60 |         60 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul24_234 |  FMUL__parameterized136_541 |        102 |        102 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul24_315 |      FMUL__parameterized138 |         71 |         71 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul24_346 |   FMUL__parameterized30_558 |         83 |         83 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul25_484 |   FMUL__parameterized75_590 |        123 |        123 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul25_516 |   FMUL__parameterized75_597 |         71 |         71 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul25_518 |   FMUL__parameterized86_599 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul25_625 |    FMUL__parameterized7_605 |         76 |         76 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul26_154 |    FMUL__parameterized1_618 |         57 |         57 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul26_544 |   FMUL__parameterized50_634 |        109 |        109 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul26_547 |   FMUL__parameterized81_637 |         74 |         74 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul26_569 |  FMUL__parameterized117_641 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul26_611 |  FMUL__parameterized102_647 |         64 |         64 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul26_687 |  FMUL__parameterized102_652 |         78 |         78 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul27_248 |   FMUL__parameterized26_656 |         53 |         53 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul27_348 |      FMUL__parameterized144 |        144 |        144 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul27_385 |   FMUL__parameterized80_661 |         53 |         53 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul27_469 |    FMUL__parameterized2_667 |         79 |         79 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul27_554 |   FMUL__parameterized17_676 |         63 |         63 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul27_677 |    FMUL__parameterized4_688 |         56 |         56 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul28_487 |   FMUL__parameterized34_709 |         59 |         59 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul28_546 |   FMUL__parameterized67_715 |         61 |         61 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul28_571 |   FMUL__parameterized15_717 |        100 |        100 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul28_660 |   FMUL__parameterized80_725 |         70 |         70 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul28_661 |   FMUL__parameterized80_726 |        133 |        133 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul29_125 |   FMUL__parameterized38_733 |         59 |         59 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul29_270 |  FMUL__parameterized125_754 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul29_296 |   FMUL__parameterized82_759 |        171 |        171 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul29_412 |  FMUL__parameterized107_768 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul2_434  |   FMUL__parameterized35_789 |        101 |        101 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul2_513  |   FMUL__parameterized60_798 |         81 |         81 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul2_610  |   FMUL__parameterized63_807 |         55 |         55 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul3_266  |   FMUL__parameterized70_827 |         78 |         78 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul3_276  |   FMUL__parameterized73_832 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul3_299  |   FMUL__parameterized74_836 |        151 |        151 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul4_355  |   FMUL__parameterized53_857 |         88 |         88 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul4_548  |   FMUL__parameterized74_867 |         69 |         69 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul4_610  |   FMUL__parameterized35_875 |         55 |         55 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul5_272  |   FMUL__parameterized88_892 |        114 |        114 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul5_405  |   FMUL__parameterized89_901 |         76 |         76 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul5_93   |    FMUL__parameterized2_908 |         60 |         60 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul6_215  |   FMUL__parameterized75_915 |         98 |         98 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul6_444  |   FMUL__parameterized65_924 |         57 |         57 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul6_517  |    FMUL__parameterized6_930 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul6_555  |    FMUL__parameterized7_933 |         65 |         65 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul6_684  |   FMUL__parameterized85_941 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul7_159  |   FMUL__parameterized30_949 |         56 |         56 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul7_386  |   FMUL__parameterized43_961 |        117 |        117 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul7_430  |   FMUL__parameterized24_968 |         75 |         75 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul7_583  |  FMUL__parameterized100_976 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul8_268  |   FMUL__parameterized34_994 |         74 |         74 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul8_321  |                    FMUL_997 |         71 |         71 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul8_322  |   FMUL__parameterized98_998 |         88 |         88 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul8_347  |  FMUL__parameterized96_1003 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul8_397  |  FMUL__parameterized76_1012 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul8_413  |  FMUL__parameterized81_1015 |         83 |         83 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul9_235  |  FMUL__parameterized50_1025 |         52 |         52 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul9_267  |  FMUL__parameterized17_1033 |         73 |         73 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul9_571  | FMUL__parameterized105_1042 |        127 |        127 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       requant0  |                     DEQUANT |        116 |        116 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant1  |     DEQUANT__parameterized0 |        130 |        130 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant10 |     DEQUANT__parameterized9 |        139 |        139 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant11 |    DEQUANT__parameterized10 |        112 |        112 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant12 |    DEQUANT__parameterized11 |        116 |        116 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant13 |    DEQUANT__parameterized12 |         95 |         95 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant14 |    DEQUANT__parameterized13 |        137 |        137 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant15 |    DEQUANT__parameterized14 |        122 |        122 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant16 |    DEQUANT__parameterized15 |        126 |        126 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant17 |    DEQUANT__parameterized16 |        104 |        104 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant18 |    DEQUANT__parameterized17 |        103 |        103 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant19 |    DEQUANT__parameterized18 |        112 |        112 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant2  |     DEQUANT__parameterized1 |        130 |        130 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant20 |    DEQUANT__parameterized19 |        100 |        100 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant21 |    DEQUANT__parameterized20 |         99 |         99 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant22 |    DEQUANT__parameterized21 |        146 |        146 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant23 |    DEQUANT__parameterized22 |        113 |        113 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant24 |    DEQUANT__parameterized23 |        123 |        123 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant25 |    DEQUANT__parameterized24 |        122 |        122 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant26 |    DEQUANT__parameterized25 |        150 |        150 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant27 |    DEQUANT__parameterized26 |        111 |        111 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant28 |    DEQUANT__parameterized27 |        127 |        127 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant29 |    DEQUANT__parameterized28 |        135 |        135 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant3  |     DEQUANT__parameterized2 |        122 |        122 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant4  |     DEQUANT__parameterized3 |         96 |         96 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant5  |     DEQUANT__parameterized4 |         97 |         97 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant6  |     DEQUANT__parameterized5 |        108 |        108 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant7  |     DEQUANT__parameterized6 |         87 |         87 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant8  |     DEQUANT__parameterized7 |        116 |        116 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant9  |     DEQUANT__parameterized8 |        108 |        108 |       0 |    0 |    0 |      0 |      0 |          1 |
+|     fc2         |                         FC2 |       7253 |       7253 |       0 |    0 |    0 |      0 |      0 |         10 |
+|       mul0_10   |      FMUL__parameterized147 |         54 |         54 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul0_14   |      FMUL__parameterized150 |        122 |        122 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul1_18   |       FMUL__parameterized32 |         70 |         70 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul1_7    |       FMUL__parameterized97 |        102 |        102 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul2_28   |    FMUL__parameterized116_9 |         67 |         67 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul2_5    |      FMUL__parameterized162 |         61 |         61 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul2_6    |       FMUL__parameterized40 |         88 |         88 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul3_13   |   FMUL__parameterized151_11 |         99 |         99 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul3_2    |   FMUL__parameterized148_13 |         68 |         68 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul3_24   |      FMUL__parameterized175 |         65 |         65 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul4_16   |   FMUL__parameterized122_18 |        102 |        102 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul4_27   |      FMUL__parameterized180 |        109 |        109 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul4_5    |        FMUL__parameterized4 |         59 |         59 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul5_11   |      FMUL__parameterized183 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul5_21   |       FMUL__parameterized59 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul5_3    |   FMUL__parameterized120_30 |         71 |         71 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul6_11   |       FMUL__parameterized67 |         82 |         82 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul6_24   |   FMUL__parameterized152_40 |         68 |         68 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul6_4    |      FMUL__parameterized187 |         85 |         85 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul7_12   |      FMUL__parameterized190 |        131 |        131 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul7_24   |       FMUL__parameterized88 |         63 |         63 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul7_3    |   FMUL__parameterized184_53 |         51 |         51 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul8_17   |   FMUL__parameterized166_60 |         81 |         81 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul8_26   |   FMUL__parameterized100_62 |        100 |        100 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul9_13   |      FMUL__parameterized143 |         64 |         64 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul9_22   |    FMUL__parameterized29_72 |         50 |         50 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       mul9_6    |   FMUL__parameterized107_77 |         85 |         85 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       requant0  |    DEQUANT__parameterized29 |         98 |         98 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant1  |    DEQUANT__parameterized30 |         90 |         90 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant2  |    DEQUANT__parameterized31 |         84 |         84 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant3  |    DEQUANT__parameterized32 |         90 |         90 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant4  |    DEQUANT__parameterized33 |        106 |        106 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant5  |    DEQUANT__parameterized34 |         91 |         91 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant6  |    DEQUANT__parameterized35 |         87 |         87 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant7  |    DEQUANT__parameterized36 |         79 |         79 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant8  |    DEQUANT__parameterized37 |         69 |         69 |       0 |    0 |    0 |      0 |      0 |          1 |
+|       requant9  |    DEQUANT__parameterized38 |         82 |         82 |       0 |    0 |    0 |      0 |      0 |          1 |
+|   serial_rx     |                     uart_rx |        419 |        419 |       0 |    0 |   65 |      0 |      0 |          0 |
++-----------------+-----------------------------+------------+------------+---------+------+------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

@@ -1,0 +1,6 @@
+# Direct dependencies observed in the local Python 3.12 verification environment.
+# The legacy Intel Neural Compressor notebook uses a separate course environment.
+torch==2.13.0
+numpy==1.26.4
+Jinja2==3.1.6
+fxpmath==0.4.10

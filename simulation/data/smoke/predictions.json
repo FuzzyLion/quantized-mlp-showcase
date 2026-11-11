@@ -1,0 +1,6 @@
+{
+  "description": "Icarus Verilog 12.0 output for the first 16 course test vectors, recorded during portfolio preparation on 2026-10-30. Regression baseline, not an independent reference model.",
+  "predictions": [5, 3, 5, 4, 3, 9, 1, 3, 3, 8, 2, 0, 4, 2, 1, 8],
+  "correct_labels": 14,
+  "samples": 16
+}

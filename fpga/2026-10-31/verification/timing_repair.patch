@@ -1,0 +1,600 @@
+--- a/sources/uart_top.sv
++++ b/sources/uart_top.sv
+@@ -1,200 +1,120 @@
++// One processing clock for UART, image storage, network and display.
++// Default clock: 100 MHz / 12 = 8.333 MHz; UART: 19200 baud, 8N1.
++module uart_top #(
++    parameter integer max_cnt_clk_net = 5,
++    parameter integer SYS_CLK_HZ = 100_000_000,
++    parameter integer BAUD_RATE = 19200
++) (
++    input wire clk, rst, din,
++    output wire dout, led,
++    output wire ledA, ledB, ledC, ledD, ledE, ledF, ledG, ledDP,
++    output wire [7:0] ledAN
++);
++    localparam integer CLOCK_DIVIDE = 2 * (max_cnt_clk_net + 1);
++    localparam integer UART_CLKS_PER_BIT =
++        (SYS_CLK_HZ + CLOCK_DIVIDE * BAUD_RATE / 2) / (CLOCK_DIVIDE * BAUD_RATE);
++    localparam integer DIV_COUNT_WIDTH = (max_cnt_clk_net < 1) ? 1 : $clog2(max_cnt_clk_net + 1);
+ 
+-// Top-level module that interfaces with UART for data reception and transmission,
+-// processes data through a neural network, and displays results on a digital display.
+-module uart_top(
+-    input clk, 
+-    input rst, 
+-    input din, // UART data input
+-    
+-    output reg dout, // UART data output
+-    output reg led, // LED indicator for UART transmission status
+-	
+-    // LED indicators for displaying results on a seven-segment display
+-    output reg ledA,
+-    output reg ledB,
+-    output reg ledC,
+-    output reg ledD,
+-    output reg ledE,
+-    output reg ledF,
+-    output reg ledG,
+-    output reg ledDP,
+-    output wire [7:0] ledAN // Anode control for the seven-segment display
+-);
++    // Free-running divider: keep XDC net_clk divide_by in sync with CLOCK_DIVIDE.
++    // The reset button does not interrupt clock pulses.
++    reg clk_net = 1'b0;
++    reg [DIV_COUNT_WIDTH-1:0] cnt_clk_net = 0;
++    always @(posedge clk) begin
++        if (cnt_clk_net == DIV_COUNT_WIDTH'(max_cnt_clk_net)) begin
++            cnt_clk_net <= 0;
++            clk_net <= ~clk_net;
++        end else cnt_clk_net <= cnt_clk_net + 1'b1;
++    end
+ 
++    // Asynchronous assertion, synchronous release in the processing domain.
++    (* ASYNC_REG = "TRUE" *) reg [1:0] reset_release = 0;
++    always @(posedge clk_net or posedge rst) begin
++        if (rst) reset_release <= 0;
++        else reset_release <= {reset_release[0], 1'b1};
++    end
++    wire rst_n = reset_release[1];
++    wire [7:0] data_in;
++    reg [7:0] data_out;
++    wire rx_vld, tx_busy;
++    reg tx_vld;
++    reg [7:0] datareg [0:783];
++    wire [6271:0] datareg_wire;
++    reg [9:0] reg_address;
++    wire [79:0] net_data_out;
+ 
+-reg [7:0] data_in; // Buffer for received UART data
+-reg [7:0] data_out; // Buffer for data to be transmitted via UART
+-reg [8*10-1:0] net_data_out;// output from network
+-reg rx_vld; // Indicates valid received data from UART
+-reg tx_busy; // Indicates UART transmitter is busy
+-reg tx_vld; // Signal to start UART transmission
++    assign ledAN = 8'b11111110;
++    assign led = tx_busy;
++    for (genvar j = 0; j < 784; j = j + 1) begin : pack_pixels
++        assign datareg_wire[j*8 +: 8] = datareg[j];
++    end
++    uart_rx #(.CLKS_PER_BIT(UART_CLKS_PER_BIT)) serial_rx (
++        .clk(clk_net), .rst_n(rst_n), .din(din),
++        .rx_dout(data_in), .rx_vld(rx_vld)
++    );
++    uart_tx #(.CLKS_PER_BIT(UART_CLKS_PER_BIT)) serial_tx (
++        .clk(clk_net), .rst_n(rst_n), .tx_din(data_out),
++        .tx_vld(tx_vld), .tx_dout(dout), .busy(tx_busy)
++    );
++    top_clk net_1 (
++        .clk(clk_net), .rst(~rst_n), .w_in(datareg_wire), .r_out(net_data_out)
++    );
++    led led1 (
++        .clk(clk_net), .result(data_out),
++        .ledA(ledA), .ledB(ledB), .ledC(ledC), .ledD(ledD),
++        .ledE(ledE), .ledF(ledF), .ledG(ledG), .ledDP(ledDP)
++    );
+ 
+-reg [7:0] datareg [783:0];// Array to store received data before processing
+-wire [6271:0] datareg_wire ;//Wire to concatenate all datareg elements for neural network input
+-reg [9:0] reg_address;// Address pointer for storing received data in datareg
++    // Preserve unsigned comparison and lowest-index tie break.
++    reg [7:0] max_score, class_index;
++    integer k;
++    always @(*) begin
++        max_score = net_data_out[0 +: 8];
++        class_index = 0;
++        for (k = 1; k < 10; k = k + 1) begin
++            if (net_data_out[k*8 +: 8] > max_score) begin
++                max_score = net_data_out[k*8 +: 8];
++                class_index = 8'(k);
++            end
++        end
++    end
+ 
+-reg data_flag; // Flag to indicate all data has been received and ready to process
+-reg data_flag_1; // Flag to process of layer1
+-reg data_flag_2; // flag to process of layer2
+-reg data_out_flag; // Flag to indicate data is ready for UART transmission
+-reg data_out_flag_e;
+-
+-wire rst_n;
+-reg clk_net; // Neural network processing clock
+-reg [9:0] cnt_clk_net;// Counter for generating clk_net
+-parameter max_cnt_clk_net = 5; // Max counter value for clk_net generation
+-assign ledAN = 8'b11111110; // Control signal for seven-segment display anodes
+-
+-// Convert the array of received data into a single wire for neural network processing
+-generate 
+-	genvar j;
+-	for (j =0; j<784; j=j+1) begin:loop
+-		assign datareg_wire [(j+1)*8-1:8*j] = datareg[j];
+-	end
+-endgenerate
+-
+-assign rst_n = ~rst;
+-
+-initial begin
+-	clk_net <=0;
+-	reg_address <=0;
+-	data_out_flag <=0;
+-	data_flag <=0;
+-	clk_net <= 0;
+-	cnt_clk_net <= 0;
+-
+-end
+-
+-// Instance of the LED display module to show neural network results
+-led led1(
+-        .clk(clk),
+-        .result(data_out),
+-        
+-        .ledA(ledA),
+-        .ledB(ledB),
+-        .ledC(ledC),
+-        .ledD(ledD),
+-        .ledE(ledE),
+-        .ledF(ledF),
+-        .ledG(ledG),
+-        .ledDP(ledDP)
+-    );
+-    
+-// UART transmitter instance for sending processed data back to the computer
+-uart_tx serial_tx(
+-    .clk(clk),
+-    .rst_n(rst_n),
+-    .tx_din(data_out),   
+-    .tx_vld(tx_vld),   
+-
+-    .tx_dout(dout) ,
+-    .busy(tx_busy)    
+-);
+-// UART receiver instance for receiving data from the computer
+-uart_rx serial_rx( 
+-    .clk(clk),
+-    .rst_n(rst_n),
+- 
+-    .din(din),
+-
+-    .rx_dout(data_in), 
+-    .rx_vld(rx_vld)    
+-
+-);	
+-
+-// Neural network processing instance
+-top_clk net_1(
+-	.clk(clk_net),
+-	.rst(0),
+-	.w_in(datareg_wire),
+-	
+-	.r_out(net_data_out)
+-	);
+-	
+-	//split output from network
+-	wire [8-1:0] output_one [9:0];
+-	generate
+-    		for (j = 0; j < 10; j = j + 1) begin : loop1
+-                	assign output_one[j] = net_data_out[8*(j+1)-1 : 8*j];
+-        	end
+-    	endgenerate
+-    	//get the classification result
+-	reg [8-1:0] max;
+-	reg [4:0] z;
+-	always @(*) begin
+-		max = output_one[0];
+-		data_out = 0;
+-        	for (z = 1; z < 10; z = z +1) begin
+-                	if (max< output_one[z]) begin
+-                		max = output_one[z];
+-                		data_out =z;
+-                	end
+-        	end
+-	end
+-// Reset and data handling: Resets internal registers on reset signal, and stores received UART data.
+-always @(posedge clk or negedge rst_n) begin
+-	if (!rst_n)begin // On reset
+-		reg_address <=0;
+-		data_flag <=0;// Clear data reception flag
+-	end
+-	else if(rx_vld)begin // If valid data is received from UART
+-		datareg[reg_address] <= data_in; // Store the received data
+-		if (reg_address == 783) begin // If the last piece of data is received
+-			reg_address <=0; // Reset address for the next data batch
+-			data_flag <=1; // Indicate data is ready for processing
+-		end
+-		else begin
+-			reg_address <= reg_address+1; // Increment address for the next piece of data
+-		end
+-	end
+-	else if (data_flag_1 == 1) begin
+-	    data_flag <= 0;
+-		reg_address <= reg_address;
+-	end
+-	else begin
+-	   reg_address <= reg_address;
+-	end
+-end
+-
+-// Clock generation for neural network processing: Generates a slower clock signal from the main clock.
+-always @(posedge clk ) begin
+-	if (cnt_clk_net ==max_cnt_clk_net) begin
+-		clk_net <= ~clk_net;// Toggle clk_net to generate a slower clock
+-		cnt_clk_net <=0;
+-	end
+-	else begin
+-		clk_net <= clk_net;
+-		cnt_clk_net <=cnt_clk_net+1;
+-	end
+-end
+-
+-// Data processing flag handling: Manages flags for synchronizing data processing and UART transmission.
+-always @(posedge clk_net) begin
+-	
+-	data_flag_1 <= data_flag; // data transit over layer1
+-	data_flag_2 <=  data_flag_1; // data transit over layer2
+-	if (data_flag_2) begin
+-		data_out_flag <= 1;// Indicate that data is ready for output
+-	end
+-	else begin
+-	   data_out_flag <= 0;
+-	end
+-end
+-
+-// UART transmission control: Manages transmission based on data processing and UART status.
+-always @(posedge clk ) begin
+-	
+-	if (data_out_flag && !tx_busy) begin
+-		tx_vld <=1;
+-        led <=0;
+-	end
+-	else if (data_out_flag && tx_busy) begin
+-		tx_vld <=0;
+-		led <=1;
+-	end
+-	else begin
+-		tx_vld <=0;
+-        led <=0;
+-	end
+-end
++    typedef enum logic [2:0] {
++        RECEIVE, WAIT_FC1, WAIT_FC2, CAPTURE_RESULT,
++        SEND_RESULT, WAIT_TX_START, WAIT_TX_DONE
++    } state_t;
++    state_t state;
++    // Host protocol: send 784 bytes, then wait for one classification byte.
++    // The pixel buffer is held stable throughout computation and transmission.
++    always @(posedge clk_net or negedge rst_n) begin
++        if (!rst_n) begin
++            state <= RECEIVE;
++            reg_address <= 0;
++            data_out <= 0;
++            tx_vld <= 0;
++        end else begin
++            tx_vld <= 0;
++            case (state)
++                RECEIVE: if (rx_vld) begin
++                    datareg[reg_address] <= data_in;
++                    if (reg_address == 783) begin
++                        reg_address <= 0;
++                        state <= WAIT_FC1;
++                    end else reg_address <= reg_address + 1'b1;
++                end
++                WAIT_FC1: state <= WAIT_FC2;
++                WAIT_FC2: state <= CAPTURE_RESULT;
++                CAPTURE_RESULT: begin
++                    data_out <= class_index;
++                    state <= SEND_RESULT;
++                end
++                SEND_RESULT: if (!tx_busy) begin
++                    tx_vld <= 1;
++                    state <= WAIT_TX_START;
++                end
++                WAIT_TX_START: if (tx_busy) state <= WAIT_TX_DONE;
++                WAIT_TX_DONE: if (!tx_busy) state <= RECEIVE;
++                default: state <= RECEIVE;
++            endcase
++        end
++    end
+ endmodule
+--- a/sources/uart_r.sv
++++ b/sources/uart_r.sv
+@@ -1,145 +1,59 @@
+-module uart_rx( 
+-   input                clk,
+-   input                rst_n,
+- 
+-   input                din, // Serial input data
+-
+-   output  reg [7:0]    rx_dout,   // 8-bit received data output
+-   output  reg          rx_vld    // Receive data output valid
+-
+-);		
+-
+-// Parameter definition: Maximum count value of the counter under each baud rate
+-localparam  BPS_115200 = 434,
+-            BPS_57600  = 868,
+-            BPS_38400  = 1302,
+-            BPS_19200  = 2604,
+-            BPS_9600   = 5208;
+-// Intermediate signals    
+-
+-reg   [12:0]      cnt_bps;
+-wire              add_cnt_bps;
+-wire              end_cnt_bps;
+-
+-reg   [9:0]       cnt_bit;
+-wire              add_cnt_bit;
+-wire              end_cnt_bit;
+-
+-reg  [12:0]       rx_bps = BPS_9600;   // Baud rate selection
+-
+-reg  [9:0]       rx_data_r;   // Receiving a frame of data (start bit, data bits, stop bit)
+-
+-reg               din_r0; // Synchronization
+-reg               din_r1; // D flip-flop
+-reg               din_r2;
+-
+-wire              nedge;
+-
+-reg              rx_flag;
+-
+-initial begin
+-	rx_flag <= 0;
+-	cnt_bps <= 0;
+-	cnt_bit <= 0;
+-end
+-
+-
+-// cnt_bps counter
+-always @(posedge clk or negedge rst_n)begin 
+-   if(!rst_n)begin
+-      cnt_bps <= 0;
+-   end 
+-   else if(add_cnt_bps)begin 
+-      if(end_cnt_bps)begin 
+-         cnt_bps <= 0;
+-      end
+-      else begin 
+-         cnt_bps <= cnt_bps + 1;
+-      end 
+-   end
+-end 
+-assign add_cnt_bps = rx_flag  ;
+-assign end_cnt_bps = add_cnt_bps && cnt_bps == rx_bps -1 ;
+-
+-// Synchronization and D flip-flop
+-always @(posedge clk or negedge rst_n)begin
+-   if (!rst_n)begin
+-      din_r0 <= 1'b1;
+-      din_r1 <= 1'b1;
+-   end
+-   else begin
+-      din_r0 <= din;
+-      din_r1 <= din_r0;   // D flip-flop
+-      din_r2 <= din_r1;
+-
+-   end
+-end
+-
+-// Detect falling edge
+-assign nedge = ~din_r1 & din_r2;
+-
+-// rx_flag 
+-always @(posedge clk or negedge rst_n)begin 
+-      if(!rst_n)begin
+-          rx_flag <= 1'b0;
+-      end 
+-      else if(nedge && rx_flag == 1'b0 )begin 
+-         rx_flag <= 1'b1; 
+-      end 
+-      else if(end_cnt_bit && rx_flag == 1'b1)begin
+-         rx_flag <= 1'b0;
+-      end 
+-end
+-
+-
+-// cnt_bit counter
+-always @(posedge clk or negedge rst_n)begin 
+-   if(!rst_n)begin
+-       cnt_bit <= 0;
+-   end 
+-   else if(add_cnt_bit)begin 
+-      if(end_cnt_bit)begin 
+-         cnt_bit <= 0;
+-      end
+-      else begin 
+-         cnt_bit <= cnt_bit + 1;
+-      end 
+-   end
+-end 
+-assign add_cnt_bit = end_cnt_bps;
+-assign end_cnt_bit = add_cnt_bit && (cnt_bit == 10-1 || rx_data_r[0]);
+-
+-// rx_data_r 
+-always @(posedge clk or negedge rst_n)begin
+-    if(!rst_n) begin
+-      rx_data_r <= 0;
++// UART 8N1 receiver. CLKS_PER_BIT must be at least 8.
++// Finish at the stop-bit centre so contiguous frames are accepted.
++module uart_rx #(parameter integer CLKS_PER_BIT = 5208) (
++    input wire clk, rst_n, din,
++    output reg [7:0] rx_dout,
++    output reg rx_vld
++);
++    localparam integer COUNT_WIDTH = $clog2(CLKS_PER_BIT);
++    (* ASYNC_REG = "TRUE" *) reg [1:0] din_sync;
++    always @(posedge clk or negedge rst_n) begin
++        if (!rst_n) din_sync <= 2'b11;
++        else din_sync <= {din_sync[0], din};
+     end
+-    else if (rx_flag &&  cnt_bps == (rx_bps>>1 ))begin
+-       rx_data_r[cnt_bit] <= din ;
++    typedef enum logic [1:0] {IDLE, START, DATA, STOP} rx_state_t;
++    rx_state_t state;
++    reg [COUNT_WIDTH-1:0] count;
++    reg [2:0] bit_index;
++    reg [7:0] shift_data;
++    always @(posedge clk or negedge rst_n) begin
++        if (!rst_n) begin
++            state <= IDLE;
++            count <= 0;
++            bit_index <= 0;
++            shift_data <= 0;
++            rx_dout <= 0;
++            rx_vld <= 0;
++        end else begin
++            rx_vld <= 0;
++            case (state)
++                IDLE: begin
++                    count <= 0;
++                    if (!din_sync[1]) state <= START;
++                end
++                START: if (count == COUNT_WIDTH'(CLKS_PER_BIT/2-1)) begin
++                    count <= 0;
++                    if (!din_sync[1]) begin
++                        bit_index <= 0;
++                        state <= DATA;
++                    end else state <= IDLE;
++                end else count <= count + 1'b1;
++                DATA: if (count == COUNT_WIDTH'(CLKS_PER_BIT-1)) begin
++                    count <= 0;
++                    shift_data[bit_index] <= din_sync[1];
++                    if (bit_index == 7) state <= STOP;
++                    else bit_index <= bit_index + 1'b1;
++                end else count <= count + 1'b1;
++                STOP: if (count == COUNT_WIDTH'(CLKS_PER_BIT-1)) begin
++                    count <= 0;
++                    state <= IDLE;
++                    if (din_sync[1]) begin
++                        rx_dout <= shift_data;
++                        rx_vld <= 1;
++                    end
++                end else count <= count + 1'b1;
++                default: state <= IDLE;
++            endcase
++        end
+     end
+-end
+-
+-// rx_dout
+-always @(posedge clk or negedge rst_n) begin
+-   if(!rst_n) begin
+-      rx_dout <= 0;
+-   end
+-   else if (end_cnt_bit)begin
+-      rx_dout <= rx_data_r[8:1] ;
+-   end
+-end
+-
+-// rx_vld
+-   always @(posedge clk or negedge rst_n) begin
+-      if(!rst_n)begin
+-         rx_vld <= 1'b0;
+-      end
+-      else if (end_cnt_bit)begin
+-         rx_vld <= 1'b1;
+-      end
+-      else  begin
+-         rx_vld <= 1'b0;
+-      end
+-   end
+-                        
+ endmodule
+--- a/sources/uart_s.sv
++++ b/sources/uart_s.sv
+@@ -1,4 +1,4 @@
+-module uart_tx(
++module uart_tx #(parameter integer CLKS_PER_BIT = 5208)( 
+     input         clk,
+     input         rst_n,
+     input  [7:0]  tx_din,    // Transmit data (8bit)
+@@ -8,13 +8,7 @@
+     output  reg   busy    
+ );
+ 
+-// Parameter definition: Maximum count value of the counter under each baud rate
+-    localparam  BPS_115200 = 434,
+-                BPS_57600  = 868,
+-                BPS_38400  = 1302,
+-                BPS_19200  = 2604,
+-                BPS_9600   = 5208;
+-
++// CLKS_PER_BIT is set by the wrapper for its processing clock.
+ // Intermediate signals    
+     reg   [12:0]  cnt_bps;    // Baud rate counter
+     wire          add_cnt_bps;
+@@ -26,7 +20,7 @@
+ 
+     reg           tx_flag;
+ 
+-    reg    [12:0]  tx_bps = BPS_9600;
++    localparam [12:0] tx_bps = CLKS_PER_BIT;
+ 
+     reg    [9:0]   tx_data_r;  // Represents a frame of data (10bit)
+ 
+@@ -115,25 +109,7 @@
+             end 
+     end
+ 
+-    /*always @(posedge clk or negedge rst_n)begin 
+-            if(!rst_n)begin
+-                busy <= 0;
+-            end 
+-            else if(tx_vld || tx_flag)begin 
+-                busy <= 1'b1;
+-            end 
+-            else begin 
+-                busy <= 0
+-            end 
+-    end*/
+-// busy
+-    always @(*)begin 
+-        if(tx_vld || tx_flag)begin 
+-            busy <= 1'b1;
+-        end 
+-        else begin 
+-            busy <= 0;
+-        end 
++    always @(*) begin
++        busy = tx_vld || tx_flag;
+     end
+-
+ endmodule
+--- a/constraints/uart_and_net.xdc
++++ b/constraints/uart_and_net.xdc
+@@ -4,11 +4,12 @@
+ # Defines the characteristics of the primary system clock
+ create_clock -add -name sys_clk -period 10.00 -waveform {0 5} [get_ports clk]; # Creates a 100MHz system clock named sys_clk with a 50% duty cycle
+ 
+-# Creates a clock for network that is a division of the primary clock
+-create_generated_clock -name net_clk -source [get_ports clk] -divide_by 10 [get_pins clk_net_reg/Q] # Generates a new clock, net_clk, that is 1/10th the frequency of sys_clk
++# clk_net toggles every (max_cnt_clk_net + 1) = 6 sys_clk cycles.
++# Its full period is 12 sys_clk cycles: 120 ns, approximately 8.333 MHz.
++create_generated_clock -name net_clk -source [get_ports clk] -divide_by 12 [get_pins clk_net_reg/Q]
+ 
+-# Groups sys_clk and net_clk as asynchronous, meaning no timing relationship is assumed between them
+-set_clock_groups -name async_sys_clk_net_clk -asynchronous -group {sys_clk} -group {net_clk} # Specifies sys_clk and net_clk are asynchronous to each other
++# sys_clk and net_clk are related clocks. Keep cross-clock paths timed.
++# UART/reset/LED interface constraints require separate interface-specific review.
+ 
+ # Sets the pin and voltage standard for various inputs and outputs
+ set_property -dict { PACKAGE_PIN C4   IOSTANDARD LVCMOS33 } [get_ports din]; # Assigns input pin for data in

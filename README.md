@@ -1,78 +1,44 @@
 # Quantized MLP on Artix-7
 
-I implemented the quantization-parameter and fixed-point functions for a neural-network RTL generator, integrated them into the course framework, and completed the Vivado flow and an FPGA board check.
+I completed the parameter-generation code for an 8-bit MNIST MLP and took the design through Vivado and a small FPGA board check. The course model has **784 → 30 → 10 neurons**. This repository contains the Python generator, generated SystemVerilog, simulation inputs and saved FPGA results.
 
-The network is an **8-bit MNIST MLP with 784 → 30 → 10 neurons**, from Hardware for Neural Networks coursework at TU Darmstadt. The course supplied the framework, model and generation templates. This documentation-only showcase presents my implementation work, earlier functional results and a later timing-repair extension.
+## My part
 
-## My implementation
+I implemented four functions in [`QuantModelStatistic`](generator/utils/utils.py):
 
-I completed the four generator parameter functions covering:
+- `get_scale_precompute_z()`: per-neuron scale and zero-point correction.
+- `get_neuron_output_bit_width()`: accumulator width from the nonzero weights.
+- `render_scale()` and `render_shift()`: fixed-point multiplier and right shift.
 
-- Per-neuron scale and zero-point correction.
-- Accumulator width.
-- Fixed-point multiplier generation.
-- Shift generation.
+The course supplied the framework, model, Jinja2 templates and supporting RTL. `FC1.sv` and `FC2.sv` are generated from those templates. I integrated my functions into that flow and ran the implementation and earlier board check.
 
-I integrated these functions into the course-provided RTL-generation framework. This work covered per-channel quantization parameters and fixed-point requantization. [Design notes](docs/design-notes.md) explain the hardware trade-offs; [scope and contributions](docs/scope-and-contributions.md) distinguishes my work, the course framework and later collaboration.
+For a later UART/clock-constraint repair, an AI coding agent implemented the changes and prepared the directed verification scripts. I reran Vivado and exported the bitstream and reports. I also used AI assistance for the local checks and repository documentation.
 
-## Earlier functional results
+## Results
 
-These results precede the 31 October timing repair:
+| Check | Result |
+| --- | --- |
+| Earlier Python model of RTL integer arithmetic | 95.26% on 10,000 test vectors |
+| Earlier Nexys A7-100T board check | 29/30 samples correct, before the UART repair |
+| Later Vivado 2026.1 implementation | 49,062 LUTs (77.38%), 40 DSPs; Slice occupancy 95.90% |
+| Later post-route timing | WNS +8.109 ns, WHS +0.122 ns at approximately 8.333 MHz |
 
-| Evaluation | Result | Scope |
-| --- | --- | --- |
-| Python model of the RTL's integer arithmetic | **95.26% on 10,000 MNIST test vectors** (9,526 correct) | Historical integer-equivalent evaluation |
-| UART-based check on a Nexys A7-100T | **29 of 30 randomly selected samples correctly classified** | Small on-board functional sample |
+The [utilization](fpga/2026-10-31/post_route_utilization.rpt) and [timing](fpga/2026-10-31/post_route_timing_summary.rpt) reports describe the repaired design. I have not retested that bitstream on a board. External I/O delay constraints remain incomplete, and DRC/methodology warnings remain. The 95.26% result is a historical Python evaluation; 29/30 is a small board sample.
 
-The board test used the course-provided UART test flow. Its saved transcript records the 29/30 count but does not include an exact test date or bitstream identifier. These are earlier results; they are not new accuracy measurements or a board retest of the later repaired implementation.
+## Run the checks
 
-## Later UART timing repair and FPGA results
+Use Python 3.12, Icarus Verilog and Tcl. From the repository root:
 
-An AI coding agent implemented the later UART/constraint timing repair and prepared its directed verification scripts. I reran the Vivado project, generated the bitstream and exported the results. This extension is separate from my original generator implementation and earlier board check.
-
-The following diagram describes the repaired interface. UART reception/transmission, image storage, network registers, classification and display use one processing domain.
-
-```mermaid
-flowchart LR
-    Host["Host computer"]
-    subgraph FPGA["FPGA processing domain: approximately 8.333 MHz"]
-        RX["UART receive"] --> Buffer["Image buffer"]
-        Buffer --> MLP["Two-layer integer MLP"]
-        MLP --> Select["Class selection"]
-        Select --> TX["UART transmit"]
-    end
-    Host -->|"784 bytes, 19200 baud"| RX
-    TX -->|"One class byte"| Host
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python scripts/check.py --simulate
+python scripts/check_fpga.py
 ```
 
-This is a high-level diagram drawn for this summary, not a circuit schematic or a copy of a lecture figure. The processing clock is derived from a 100 MHz board input by division by 12. The UART protocol is nominally **19,200 baud, 8N1**. The host sends one image and waits for its reply before sending another.
+The local checks pass four parameter tests and compare 16 HDL predictions with a saved baseline. All 16 match the baseline; 14 match the fixture labels. The FPGA check validates saved source hashes, Tcl paths and board RTL compilation. These checks do not run Vivado or test a board.
 
-The following values are transcribed from my saved **31 October 2026** Vivado reports, targeting **`xc7a100tcsg324-1`** with **Vivado 2026.1**. Synthesis, routing and bitstream generation completed.
+Start with [`generator/utils/utils.py`](generator/utils/utils.py) and [`rtl/`](rtl/). [Design notes](docs/design-notes.md) cover the arithmetic, model-loading environment and FPGA recreation steps.
 
-| Post-route resource | Used | Utilization |
-| --- | ---: | ---: |
-| LUTs | 49,062 | 77.38% |
-| Flip-flops | 4,025 | 3.17% |
-| DSPs | 40 | 16.67% |
-| Block RAM tiles | 0 | 0.00% |
-| Slices | 15,200 | 95.90% |
-
-| Timing or routing metric | Recorded result |
-| --- | ---: |
-| Setup WNS | +8.109 ns |
-| Hold WHS | +0.122 ns |
-| TNS / THS | 0 / 0 ns |
-| Failing setup / hold endpoints | 0 / 0 |
-| Unclocked register pins | 0 |
-| Unconstrained internal endpoints | 0 |
-| Routing errors | 0 |
-
-**These results establish internal timing closure under the applied constraints.** Two input ports and ten output ports still lack I/O delay constraints. Slice occupancy is high at 95.90%. The exported reports retain **121 ordinary DRC warnings** and **3,119 small-multiplier methodology warnings**. This is not a zero-warning build or complete external-interface timing signoff. **I have not retested the repaired implementation on a physical board.**
-
-## Verification of the later implementation
-
-- The existing parameter tests passed 4/4. A 16-example clocked HDL regression matched its saved prediction baseline; 14/16 predictions matched the fixture labels. This small fixture is not an accuracy benchmark.
-- Saved repair logs report directed UART-wrapper tests and three full-network frames whose score bytes matched an unchanged reference instance. These are recorded simulation results, not a new full-dataset accuracy measurement.
-- I reran synthesis and implementation in Vivado. The bitstream and original reports are not included in this showcase.
-
-This is a documentation-only showcase. It does not provide the sources or fixtures needed to reproduce those tests or the FPGA build. [The structured result summary](results/implementation-summary.json) contains the same reported metrics and limits.
+This is coursework from Hardware for Neural Networks at TU Darmstadt. Course PDFs and full datasets are excluded. No repository-wide license is added over the course-derived materials.
