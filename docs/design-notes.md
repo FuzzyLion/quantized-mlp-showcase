@@ -2,9 +2,21 @@
 
 ## Accumulator width and fixed-point scale
 
-The template only instantiates a multiplier for nonzero weights, so `get_neuron_output_bit_width()` sizes each accumulator from the products that are actually summed, `2 * bit_width + ceil(log2(max(1, N_nonzero)))`. An 8-bit unsigned input times an 8-bit signed weight fits in 16 bits. The rule leaves out the bias constant, though, and a large one could overflow the accumulator. A general quantizer would need a range check there. I only built this for the course model and didn't add one.
+The template only instantiates a multiplier for nonzero weights, so `get_neuron_output_bit_width()` sizes each accumulator from the products that are actually summed:
 
-`render_scale()` and `render_shift()` turn the output scale S = S_w · S_x / S_y into a multiplier M and a right shift R with S ≈ M / 2^R. At width 5, 0.125 becomes M = 8 and R = 6. The course's `DEQUANT` module applies them and adds the output zero-point.
+```math
+\text{width} = 16 + \lceil \log_2 N \rceil
+```
+
+The 16 bits hold one product of an 8-bit unsigned input and an 8-bit signed weight. The second term covers the growth from adding up $N$ of them, where $N$ is the number of nonzero weights. The rule leaves out the bias constant, though, and a large one could overflow the accumulator. A general quantizer would need a range check there. I only built this for the course model and didn't add one.
+
+`render_scale()` and `render_shift()` turn the output scale into a multiplier $M$ and a right shift $R$:
+
+```math
+S = \frac{S_w \, S_x}{S_y} \approx \frac{M}{2^R}
+```
+
+At width 5, for example, 0.125 becomes $M = 8$ and $R = 6$. The course's `DEQUANT` module applies them and adds the output zero-point.
 
 ## Timing repair
 

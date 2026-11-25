@@ -4,10 +4,10 @@ In the Hardware for Neural Networks lab at TU Darmstadt, I took an 8-bit quantiz
 
 ## Folding the zero-point into the bias
 
-Activations are quantized with a zero-point, so the straightforward datapath subtracts Z_x from every input before multiplying. I moved that work to generation time:
+Activations are quantized with a zero-point, so the straightforward datapath subtracts $Z_x$ from every input before multiplying. I moved that work to generation time:
 
-```text
-Σ q_w · (q_x − Z_x) + q_b  =  Σ q_w · q_x  +  (q_b − Z_x · Σ q_w)
+```math
+\sum q_w \, (q_x - Z_x) + q_b \;=\; \sum q_w \, q_x + \underbrace{\Big( q_b - Z_x \sum q_w \Big)}_{\text{precomputed}}
 ```
 
 The bracket contains no input, so each neuron gets one constant that can be computed in advance. In `get_scale_precompute_z()` that is `qb - zx * qw.sum(dim=1)`. `qw` is [neurons, inputs], so summing over the inputs leaves one value per neuron, and the template adds it as that neuron's bias. The multipliers then take the raw 8-bit unsigned input instead of a 9-bit signed difference.
