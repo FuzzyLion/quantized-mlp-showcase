@@ -1,11 +1,6 @@
 {
   "source_export": "portfolio_export_20261031_142730",
   "files": {
-    "TIMING_REPAIR.md": {
-      "source_path": "portfolio_export_20261031_142730/TIMING_REPAIR.md",
-      "source_sha256": "b9da21405aab5c9c95261419138071b09562ed185cbebe12064f2224b9492681",
-      "packaged_sha256": "b9da21405aab5c9c95261419138071b09562ed185cbebe12064f2224b9492681"
-    },
     "applied_constraints.xdc": {
       "source_path": "portfolio_export_20261031_142730/applied_constraints.xdc",
       "source_sha256": "7b14628617e1ca2a675f72739348455aeef4c1789e6e1d9fb0f472cbdf6664e0",
@@ -131,6 +126,14 @@
       "source_sha256": "e2319d262ea4199b4dfae4624969d95ef43c65c9f1ef3146e2df81d16530e23f",
       "packaged_sha256": "e2319d262ea4199b4dfae4624969d95ef43c65c9f1ef3146e2df81d16530e23f"
     },
+    "verification/board_test.log": {
+      "source_path": "portfolio_export_20261031_142730/verification.md",
+      "source_sha256": "352aadc5d916f9c48ed3e9492f675416d3501a5961620dce4f3225ff03e066f5",
+      "packaged_sha256": "352aadc5d916f9c48ed3e9492f675416d3501a5961620dce4f3225ff03e066f5",
+      "changes": [
+        "renamed from verification.md so GitHub shows the raw terminal log as plain text; content unchanged"
+      ]
+    },
     "verification/default_test.log": {
       "source_path": "portfolio_export_20261031_142730/verification/default_test.log",
       "source_sha256": "4f26052fb394f8621db8a769ba10d38a0819404c2d7f227c1bc53e5a763b5ddb",
@@ -165,11 +168,6 @@
       "source_path": "portfolio_export_20261031_142730/verification/validated_sources.json",
       "source_sha256": "38772b2740b2d8749c146ed5c9b9e2970964bdd329d4bbabeb1daf6f68b9f6e3",
       "packaged_sha256": "38772b2740b2d8749c146ed5c9b9e2970964bdd329d4bbabeb1daf6f68b9f6e3"
-    },
-    "verification.md": {
-      "source_path": "portfolio_export_20261031_142730/verification.md",
-      "source_sha256": "352aadc5d916f9c48ed3e9492f675416d3501a5961620dce4f3225ff03e066f5",
-      "packaged_sha256": "352aadc5d916f9c48ed3e9492f675416d3501a5961620dce4f3225ff03e066f5"
     },
     "verification/history/recreate_project.original.tcl": {
       "source_path": "portfolio_export_20261031_142730/recreate_project.tcl",

@@ -1,37 +1,43 @@
 # Design notes
 
-## Integer datapath
+## Accumulator width and fixed-point scale
 
-For symmetric quantized weights, I precompute the scale and input zero-point correction for each output neuron:
+The template only instantiates a multiplier for nonzero weights, so `get_neuron_output_bit_width()` sizes each accumulator from the products that are actually summed, `2 * bit_width + ceil(log2(max(1, N_nonzero)))`. An 8-bit unsigned input times an 8-bit signed weight fits in 16 bits. The rule leaves out the bias constant, though, and a large one could overflow the accumulator. A general quantizer would need a range check there. I only built this for the course model and didn't add one.
 
-```text
-S_i = S_Wi * S_X / S_Y
-C_i = q_bi - Z_X * sum_j(q_wij)
-q_yi ≈ S_i * (sum_j(q_wij * q_xj) + C_i) + Z_Y
-```
+`render_scale()` and `render_shift()` turn the output scale S = S_w · S_x / S_y into a multiplier M and a right shift R with S ≈ M / 2^R. At width 5, 0.125 becomes M = 8 and R = 6. The course's `DEQUANT` module applies them and adds the output zero-point.
 
-This removes the need to subtract the input zero-point from every input at runtime. The first layer uses the model's input parameters; the second uses the preceding layer's output parameters.
+## Timing repair
 
-The accumulator rule is `2 * bit_width + ceil(log2(max(1, N_nonzero)))`. It accounts for the products emitted by the sparse template, but arbitrary bias corrections still need a range check. The scale becomes `M / 2**R`: 0.125, for example, is multiplier 8 with shift 6.
+Failing paths after I fixed the constraints, before the UART rework:
 
-The course templates skip zero weights and connect accumulation, requantization and ReLU. Output narrowing uses bit selection. This flow targets the supplied model; it is not a general overflow-safe quantizer.
+| Paths | Worst setup slack | Failing endpoints |
+| --- | ---: | ---: |
+| Inside `sys_clk` | -10.307 ns | 3,887 |
+| `sys_clk` → `net_clk` | -15.324 ns | 248 |
+| `net_clk` → `sys_clk` | -12.839 ns | 11 |
+| Inside `net_clk` | +79.051 ns | 0 |
 
-## Board interface
+The report for this run was overwritten by the next build, so it isn't in the repository.
 
-The repaired UART wrapper receives 784 bytes, holds the image stable and returns one class byte. The host waits for the reply before sending another image. The shared processing clock is approximately 8.333 MHz, derived from 100 MHz by division by 12. UART uses 434 cycles per bit for nominal 19,200 baud, 8N1. This is a request/reply interface, and the processing clock is not an image-throughput measurement.
+The two XDC commands disappeared because XDC is Tcl, and Tcl only treats `#` as a comment at the start of a command. Without a `;` before it, the comment was read as extra arguments, and Vivado dropped both commands with a parse warning.
+
+I removed the asynchronous clock group instead of repairing its comment. `net_clk` is divided from `sys_clk`, so the two clocks have a fixed relationship, and declaring them asynchronous would make Vivado skip every path between them. The original wrapper fed the 100 MHz pixel buffer straight into the network without a synchronizer or handshake, so those paths needed to be timed, not hidden.
+
+The reworked wrapper receives 784 bytes, holds the image while the network computes and sends back one class byte. Everything runs on 100 MHz / 12, about 8.333 MHz, and UART gets 434 cycles per bit, which is 19,201 baud against the host's 19,200 baud 8N1. The slow clock costs nothing here, since sending one image over UART takes about 0.4 s anyway.
+
+Codex also wrote directed testbenches for the wrapper. They cover frame and pixel order, the wait for both network stages, tied scores, one reply per image and reset in the middle of a frame or a reply. In three full-network frames, every score byte matched an unchanged copy of the original network. The logs are included. The testbench sources are not.
+
+Evidence in [fpga/2026-10-31/](../fpga/2026-10-31/):
+
+- [initial_incomplete_constraints_timing.rpt](../fpga/2026-10-31/verification/history/initial_incomplete_constraints_timing.rpt): the first report, with 323 unclocked register pins and 403 unconstrained endpoints
+- [initial_applied_constraints.xdc](../fpga/2026-10-31/verification/history/initial_applied_constraints.xdc): the constraints Vivado actually applied, without the two dropped commands
+- [timing_repair.patch](../fpga/2026-10-31/verification/timing_repair.patch): the constraint and wrapper changes
+- [default_test.log](../fpga/2026-10-31/verification/default_test.log) and [network_test.log](../fpga/2026-10-31/verification/network_test.log): the wrapper testbench runs
+- [post_route_timing_summary.rpt](../fpga/2026-10-31/post_route_timing_summary.rpt): the final timing
+- [board_test.log](../fpga/2026-10-31/verification/board_test.log): the 29/30 board run
 
 ## Rebuilding
 
-Run `generator/verilog_generator.ipynb` from `generator/` to write layers into `rtl/`. It uses the legacy Intel Neural Compressor loading API and needs the course-compatible environment. I have not rerun it here; the included generated layers support local simulation without it.
-
-The small fixture contains the first 16 original course samples. Full simulation needs the original quantized MIF files under `simulation/data/`. Board scripts also need the original `testdata/`, PySerial and Matplotlib.
-
-To recreate the saved Vivado 2026.1 project for `xc7a100tcsg324-1`, run from the repository root:
-
-```bash
-vivado -mode batch -source fpga/2026-10-31/recreate_project.tcl
-```
-
-This creates the project under `fpga/2026-10-31/build/project_quant_net/`; synthesis and implementation must be launched separately. Local path checks passed, but I have not run this adapted script in Vivado.
-
-The [saved FPGA bundle](../fpga/2026-10-31/) retains reports, source snapshots, a bitstream and historical logs. The directed UART testbench sources are absent. The [older board transcript](../fpga/2026-10-31/verification.md) has no timestamp or bitstream identifier tying it to the repair. Two inputs and ten outputs lack I/O delays; the reports retain 121 DRC and 3,119 small-multiplier methodology warnings. The repaired bitstream has not been retested on a board.
+- [generator/verilog_generator.ipynb](../generator/verilog_generator.ipynb) writes `FC1.sv` and `FC2.sv` into `rtl/`. Run it from `generator/`. It needs the course environment for the legacy Intel Neural Compressor API, and I haven't rerun it for this repository.
+- `simulation/data/smoke/` holds 16 samples for the local simulation. A full run needs the course's MIF files under `simulation/data/`. The board scripts need the course `testdata/`, PySerial and Matplotlib.
+- `vivado -mode batch -source fpga/2026-10-31/recreate_project.tcl` recreates the project under `fpga/2026-10-31/build/`. Synthesis and implementation are started separately. The script passes the local path checks, but I haven't run this adapted version in Vivado.
